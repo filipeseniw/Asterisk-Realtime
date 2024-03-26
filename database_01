@@ -119,3 +119,7 @@ CREATE TABLE IF NOT EXISTS `sipfriends` (
 
 
 
+
+# teste de inserção basico
+insert into sipfriends (id, name, type, host, secret, nat, context) values
+ ('1','1001','friend','dynamic','123456','yes', 'teste');
