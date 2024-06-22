@@ -1,9 +1,0 @@
-#!/usr/bin/python3
-
-
-from asterisk.agi import *
-
-agi = AGI()
-
-agi.say_digits(51982062868)
-agi.verbose("UM TESTE DE AGI PYTHON")
