@@ -1,0 +1,30 @@
+apt update 
+
+apt install -y tzdata 
+
+dpkg-reconfigure tzdata  
+
+apt install iproute2 iputils-ping git vim -y
+
+apt install python3 pip 
+
+pip install pyst2
+
+apt install build-essential wget curl libedit-dev uuid-dev libjansson-dev libxml2-dev libsqlite3-dev -y
+
+apt install libmysqlclient-dev -y   
+
+cd /usr/src
+git clone -b 18 https://github.com/asterisk/asterisk asterisk-18	
+
+
+./configure --libdir=/usr/lib64 --with-pjproject-bundled
+make
+make menuselect
+	add-ons
+	  res_config_mysql  --> marcar essa opção
+	  cdr_mysql         --> marcar essa opção
+make install
+
+vim /etc/asterisk/modules.conf
+	load = chan_sip.so
