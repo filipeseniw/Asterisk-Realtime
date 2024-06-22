@@ -19,107 +19,125 @@ bash-4.4# mysql -u root -p
 
 
 
-# Table structure for table `sipfriends`.
-# https://docs.asterisk.org/Fundamentals/Asterisk-Configuration/Database-Support-Configuration/SIP-Realtime-MySQL-table-structure/
+Inserir ramal teste:
 
-CREATE TABLE IF NOT EXISTS `sipfriends` (
- `id` int(11) NOT NULL AUTO_INCREMENT,
- `name` varchar(10) NOT NULL,
- `ipaddr` varchar(15) DEFAULT NULL,
- `port` int(5) DEFAULT NULL,
- `regseconds` int(11) DEFAULT NULL,
- `defaultuser` varchar(10) DEFAULT NULL,
- `fullcontact` varchar(35) DEFAULT NULL,
- `regserver` varchar(20) DEFAULT NULL,
- `useragent` varchar(20) DEFAULT NULL,
- `lastms` int(11) DEFAULT NULL,
- `host` varchar(40) DEFAULT NULL,
- `type` enum('friend','user','peer') DEFAULT NULL,
- `context` varchar(40) DEFAULT NULL,
- `permit` varchar(40) DEFAULT NULL,
- `deny` varchar(40) DEFAULT NULL,
- `secret` varchar(40) DEFAULT NULL,
- `md5secret` varchar(40) DEFAULT NULL,
- `remotesecret` varchar(40) DEFAULT NULL,
- `transport` enum('udp','tcp','udp,tcp','tcp,udp') DEFAULT NULL,
- `dtmfmode` enum('rfc2833','info','shortinfo','inband','auto') DEFAULT NULL,
- `directmedia` enum('yes','no','nonat','update') DEFAULT NULL,
- `nat` enum('yes','no','never','route') DEFAULT NULL,
- `callgroup` varchar(40) DEFAULT NULL,
- `pickupgroup` varchar(40) DEFAULT NULL,
- `language` varchar(40) DEFAULT NULL,
- `allow` varchar(40) DEFAULT NULL,
- `disallow` varchar(40) DEFAULT NULL,
- `insecure` varchar(40) DEFAULT NULL,
- `trustrpid` enum('yes','no') DEFAULT NULL,
- `progressinband` enum('yes','no','never') DEFAULT NULL,
- `promiscredir` enum('yes','no') DEFAULT NULL,
- `useclientcode` enum('yes','no') DEFAULT NULL,
- `accountcode` varchar(40) DEFAULT NULL,
- `setvar` varchar(40) DEFAULT NULL,
- `callerid` varchar(40) DEFAULT NULL,
- `amaflags` varchar(40) DEFAULT NULL,
- `callcounter` enum('yes','no') DEFAULT NULL,
- `busylevel` int(11) DEFAULT NULL,
- `allowoverlap` enum('yes','no') DEFAULT NULL,
- `allowsubscribe` enum('yes','no') DEFAULT NULL,
- `videosupport` enum('yes','no') DEFAULT NULL,
- `maxcallbitrate` int(11) DEFAULT NULL,
- `rfc2833compensate` enum('yes','no') DEFAULT NULL,
- `mailbox` varchar(40) DEFAULT NULL,
- `session-timers` enum('accept','refuse','originate') DEFAULT NULL,
- `session-expires` int(11) DEFAULT NULL,
- `session-minse` int(11) DEFAULT NULL,
- `session-refresher` enum('uac','uas') DEFAULT NULL,
- `t38pt_usertpsource` varchar(40) DEFAULT NULL,
- `regexten` varchar(40) DEFAULT NULL,
- `fromdomain` varchar(40) DEFAULT NULL,
- `fromuser` varchar(40) DEFAULT NULL,
- `qualify` varchar(40) DEFAULT NULL,
- `defaultip` varchar(40) DEFAULT NULL,
- `rtptimeout` int(11) DEFAULT NULL,
- `rtpholdtimeout` int(11) DEFAULT NULL,
- `sendrpid` enum('yes','no') DEFAULT NULL,
- `outboundproxy` varchar(40) DEFAULT NULL,
- `callbackextension` varchar(40) DEFAULT NULL,
- `registertrying` enum('yes','no') DEFAULT NULL,
- `timert1` int(11) DEFAULT NULL,
- `timerb` int(11) DEFAULT NULL,
- `qualifyfreq` int(11) DEFAULT NULL,
- `constantssrc` enum('yes','no') DEFAULT NULL,
- `contactpermit` varchar(40) DEFAULT NULL,
- `contactdeny` varchar(40) DEFAULT NULL,
- `usereqphone` enum('yes','no') DEFAULT NULL,
- `textsupport` enum('yes','no') DEFAULT NULL,
- `faxdetect` enum('yes','no') DEFAULT NULL,
- `buggymwi` enum('yes','no') DEFAULT NULL,
- `auth` varchar(40) DEFAULT NULL,
- `fullname` varchar(40) DEFAULT NULL,
- `trunkname` varchar(40) DEFAULT NULL,
- `cid_number` varchar(40) DEFAULT NULL,
- `callingpres` enum('allowed_not_screened','allowed_passed_screen','allowed_failed_screen','allowed','prohib_not_screened','prohib_passed_screen','prohib_failed_screen','prohib') DEFAULT NULL,
- `mohinterpret` varchar(40) DEFAULT NULL,
- `mohsuggest` varchar(40) DEFAULT NULL,
- `parkinglot` varchar(40) DEFAULT NULL,
- `hasvoicemail` enum('yes','no') DEFAULT NULL,
- `subscribemwi` enum('yes','no') DEFAULT NULL,
- `vmexten` varchar(40) DEFAULT NULL,
- `autoframing` enum('yes','no') DEFAULT NULL,
- `rtpkeepalive` int(11) DEFAULT NULL,
- `call-limit` int(11) DEFAULT NULL,
- `g726nonstandard` enum('yes','no') DEFAULT NULL,
- `ignoresdpversion` enum('yes','no') DEFAULT NULL,
- `allowtransfer` enum('yes','no') DEFAULT NULL,
- `dynamic` enum('yes','no') DEFAULT NULL,
- PRIMARY KEY (`id`),
- UNIQUE KEY `name` (`name`),
- KEY `ipaddr` (`ipaddr`,`port`),
- KEY `host` (`host`,`port`)
-) ENGINE=MyISAM;
+insert into sipfriends (id, name, type, host, secret, nat, context, qualify) values
+ ('1','1001','friend','dynamic','123456','force_rport,comedia', 'teste', 'yes');
+
+
+Criar tabela de rotas:
+
+CREATE TABLE `routes` (
+`id` int(11) NOT NULL auto_increment,
+`context` varchar(20) NOT NULL default '',
+`exten` varchar(20) NOT NULL default '',
+`priority` tinyint(4) NOT NULL default '0',
+`app` varchar(20) NOT NULL default '',
+`appdata` varchar(128) NOT NULL default '',
+PRIMARY KEY (`context`,`exten`,`priority`),
+KEY `id` (`id`)
+);
+
+#### formato dos dados na tabela de rotas: #####
+#### se a call não estiver passando audio ou não reproduzindo musica de espera, tem que usar o answer() #####
+'1', 'anycall', '_7000', '1', 'Answer', 'Answer()'
+'1', 'anycall', '_7000', '2', 'MixMonitor', '/gravacoes/${UNIQUEID}.wav'
+'1', 'anycall', '_7000', '3', 'Queue', '7000'
+'4', 'anycall', '_8000', '1', 'Answer', 'Answer()'
+'2', 'anycall', '_8000', '2', 'Queue', '8000'
+'3', 'anycall', '_X.', '1', 'Dial', 'SIP/${EXTEN}'
+
+
+Criar tabela de cdr:
+
+ CREATE TABLE `cdr` (
+ `calldate` datetime NOT NULL ,
+ `clid` varchar(80) NOT NULL default '',
+ `src` varchar(80) NOT NULL default '',
+ `dst` varchar(80) NOT NULL default '',
+ `dcontext` varchar(80) NOT NULL default '', 
+ `channel` varchar(80) NOT NULL default '',
+ `dstchannel` varchar(80) NOT NULL default '',
+ `lastapp` varchar(80) NOT NULL default '',
+ `lastdata` varchar(80) NOT NULL default '',
+ `duration` int(11) NOT NULL default '0',
+ `billsec` int(11) NOT NULL default '0',
+ `disposition` varchar(45) NOT NULL default '', 
+ `amaflags` int(11) NOT NULL default '0',
+ `accountcode` varchar(20) NOT NULL default '',
+ `userfield` varchar(255) NOT NULL default '',
+ `uniqueid` VARCHAR(32) NOT NULL default '',
+ `linkedid` VARCHAR(32) NOT NULL default '',
+ `sequence` VARCHAR(32) NOT NULL default '',
+ `peeraccount` VARCHAR(32) NOT NULL default ''
+ );
+
+ ALTER TABLE `cdr` ADD INDEX ( `calldate` );
+ ALTER TABLE `cdr` ADD INDEX ( `dst` );
+ ALTER TABLE `cdr` ADD INDEX ( `accountcode` );
 
 
 
+Criar tabela de queues:
 
-# teste de inserção basico
-insert into sipfriends (id, name, type, host, secret, nat, context) values
- ('1','1001','friend','dynamic','123456','yes', 'teste');
+
+CREATE TABLE queues (
+name VARCHAR(128) PRIMARY KEY,
+musiconhold VARCHAR(128),
+announce VARCHAR(128),
+context VARCHAR(128),
+timeout INT(11),
+monitor_join BOOL,
+monitor_format VARCHAR(128),
+queue_youarenext VARCHAR(128),
+queue_thereare VARCHAR(128),
+queue_callswaiting VARCHAR(128),
+queue_holdtime VARCHAR(128),
+queue_minutes VARCHAR(128),
+queue_seconds VARCHAR(128),
+queue_lessthan VARCHAR(128),
+queue_thankyou VARCHAR(128),
+queue_reporthold VARCHAR(128),
+announce_frequency INT(11),
+announce_round_seconds INT(11),
+announce_holdtime VARCHAR(128),
+retry INT(11),
+wrapuptime INT(11),
+maxlen INT(11),
+servicelevel INT(11),
+strategy VARCHAR(128),
+joinempty VARCHAR(128),
+leavewhenempty VARCHAR(128),
+eventmemberstatus BOOL,
+eventwhencalled BOOL,
+reportholdtime BOOL,
+memberdelay INT(11),
+weight INT(11),
+timeoutrestart BOOL,
+periodic_announce VARCHAR(50),
+periodic_announce_frequency INT(11),
+ringinuse BOOL,
+setintTCCterfacevar BOOL
+);
+
+
+
+CREATE TABLE queue_members (
+uniqueid INT(10) UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+membername varchar(40),
+queue_name varchar(128),
+interface varchar(128),
+penalty INT(11),
+paused INT(11),
+UNIQUE KEY queue_interface (queue_name, interface)
+);
+
+
+### COLOCAR UMA FK DE queue_members.queue_name para queues.name ####
+### ADICIONEI A FK VIA MYSQL WORKBENCH, NO ENTANTO PODE SER FEITO VIA CODIGO ASSIM: ###
+
+ALTER TABLE queue_members
+ADD CONSTRAINT fk_queue_name
+FOREIGN KEY (queue_name) 
+REFERENCES queues(name);
+
