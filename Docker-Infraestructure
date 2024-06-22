@@ -1,0 +1,19 @@
+Criação da rede:
+docker network create -d macvlan --subnet=192.168.1.0/24 --gateway=192.168.1.1 -o parent=eno1 rede-voip
+
+
+Criação do Container de banco de dados:
+docker run -itd  -e MYSQL_ROOT_PASSWORD=hesoyam --name database_01 --net rede-voip --ip 192.168.1.200 --cap-add NET_ADMIN mysql
+
+
+docker run -itd  --name apolo_sip01 --net rede-voip --ip 192.168.1.20 --cap-add NET_ADMIN ubuntu
+
+docker run -itd  --name hermes_sip01 --net rede-voip --ip 192.168.1.30 --cap-add NET_ADMIN ubuntu
+
+docker run -itd  --name poseidon_sip01 --net rede-voip --ip 192.168.1.40 --cap-add NET_ADMIN ubuntu
+
+docker run -itd  --name hades_sip01 --net rede-voip --ip 192.168.1.50 --cap-add NET_ADMIN ubuntu
+
+docker run -itd  --name hades_sip02 --net rede-voip --ip 192.168.1.51 --cap-add NET_ADMIN ubuntu
+
+
